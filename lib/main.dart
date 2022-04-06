@@ -8,8 +8,15 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  int count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +35,30 @@ class MyApp extends StatelessWidget {
                 1.0),
             width: 50,
             height: 250,
+            child: Center(
+              child: SizedBox(
+                width: null,
+                height: null,
+                child: ElevatedButton(
+                  child: Text(
+                    '$count + $index',
+                    style: const TextStyle(fontSize: 60),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      count++;
+                    });
+                  },
+                  onLongPress: () {
+                    setState(() {
+                      count = 0;
+                    });
+                  },
+                ),
+              ),
+            ),
           );
         }),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: (){
-            print('I love penis');
-          },
-        ),
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
@@ -47,8 +70,8 @@ class MyApp extends StatelessWidget {
               label: 'Business',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.school),
-              label: 'School',
+              icon: Icon(Icons.info),
+              label: 'About',
             )
           ],
         ),
@@ -59,3 +82,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
