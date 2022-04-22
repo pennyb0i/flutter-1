@@ -1,9 +1,10 @@
-import 'dart:math';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_1/route_generator.dart';
 
-final _random = Random();
+import 'entities/contact.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,85 +55,106 @@ class _HomePageState extends State<HomePage> {
   int count = 0;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: const Color(0xFF0F0F0F),
-        appBar: AppBar(
-            backgroundColor: Colors.deepPurpleAccent,
-            title: const Text('epic gamer moment')
-        ),
-        body: ListView.builder(itemBuilder: (_,index) {
-          return const ContactEntry();
-        }),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: const Color(0xFF0F0F0F),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_box_outlined),
-              activeIcon: Icon(Icons.account_box),
-              label: 'Contacts',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.map_outlined),
-              activeIcon: Icon(Icons.map),
-              label: 'Map',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.message_outlined),
-              activeIcon: Icon(Icons.message),
-              label: 'Messages',
-            )
-          ],
-        ),
-        drawer: const Drawer(
-          child: Icon(Icons.add_to_drive),
-        ),
-      ),
+    return const MaterialApp(
+      initialRoute: '/',
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }
 
-class ContactEntry extends StatelessWidget {
-  const ContactEntry({Key? key}) : super(key: key);
+class ContactEntry extends StatefulWidget {
+  final Contact contact;
+  const ContactEntry ({Key? key,  required this.contact}) : super(key: key);
 
+  @override
+  State<ContactEntry> createState() => _ContactEntryState();
+}
+
+class _ContactEntryState extends State<ContactEntry> {
   static const mainTxtStyle = TextStyle(fontSize: 20, color: Colors.blueGrey);
   static const descTxtStyle = TextStyle(fontSize: 12, color: Colors.grey);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white24, width: 2.0),
-      ),
-      padding: const EdgeInsets.all(15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ListTile(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          '/details',
+          arguments: widget.contact,
+        );
+      },
+      leading: const Icon(Icons.account_box),
+      title: Text(widget.contact.name,style: mainTxtStyle),
+      subtitle: Row(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  children: const [
-                    Text("name", style: mainTxtStyle),
-                  ],
-                ),
-              ),
-              Row(
-                children: const [
-                  Text("number ", style: descTxtStyle),
-                  Text("country", style: descTxtStyle),
-                ],
-              ),
-            ],
-          ),
-          const Icon(Icons.account_box, size: 50),
+          Text(widget.contact.number,style: descTxtStyle),
+          Text(widget.contact.country,style: descTxtStyle),
         ],
+      ),
+      trailing: IconButton(icon: const Icon(Icons.call, color: Colors.green,),
+        onPressed: () {
+          dev.log("Beepboop!");
+        },),
+    );
+  }
+}
+
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white24,
+      appBar: AppBar(
+          backgroundColor: Colors.blueGrey,
+          title: const Text('Contacts')
+      ),
+      body: ListView.builder(
+          itemCount: contacts.length,
+          itemBuilder: (_,index) {
+            return ContactEntry(contact: contacts[index]);
+          }),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF0F0F0F),
+        unselectedItemColor: Colors.white38,
+        selectedItemColor: Colors.blueGrey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_box_outlined),
+            activeIcon: Icon(Icons.account_box),
+            label: 'Contacts',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map_outlined),
+            activeIcon: Icon(Icons.map),
+            label: 'Map',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message_outlined),
+            activeIcon: Icon(Icons.message),
+            label: 'Messages',
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            '/details',
+            arguments: const Contact('', '', ''),
+          );
+        },
       ),
     );
   }
 }
+
 
 
 
